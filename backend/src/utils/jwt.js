@@ -4,9 +4,7 @@ import config from '../config/config.js';
 // Function to generate JWT token
 export const generateToken = (payload) => {
 
-    if(!payload || typeof payload !== 'object') {
-        throw new Error('Payload must be an object');
-    }
+    if(!payload || typeof payload !== 'object') throw new Error('Payload must be an object');
 
     try{
         const token = jwt.sign(
@@ -27,10 +25,8 @@ export const generateToken = (payload) => {
 // Function to verify JWT token
 export const verifyToken = (token) => {
     
-    if(!token || typeof token !== 'string') {
-        throw new Error('Token is requiered');
-    }
-
+    if(!token || typeof token !== 'string') throw new Error('Token is requiered');
+    
     try{
         const decoded = jwt.verify(
             token,

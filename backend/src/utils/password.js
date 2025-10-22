@@ -1,35 +1,48 @@
 import bcrypt from 'bcryptjs';
-
-const SALT_ROUNDS = 12;  // How many times is executed the hashing 
+import config from '../config/config.js';
 
 // Checks if a password is strong enough
 export const strongPassword = (password) => {
 
-    const errors = [];
-
     if (password.length < 8) {
-        errors.push('Password must be at least 8 characters long');
+        return {
+            isStrong: false,
+            error: 'Password must be at least 8 characters long'
+        };
     }
 
     if (!/[A-Z]/.test(password)) {
-        errors.push('Password must contain at least one uppercase letter');
+        return {
+            isStrong: false,
+            error: 'Password must contain at least one uppercase letter'
+        };
     }
 
     if (!/[a-z]/.test(password)) {
-        errors.push('Password must contain at least one lowercase letter');
+        return {
+            isStrong: false,
+            error: 'Password must contain at least one lowercase letter'
+        };
     }
     
     if (!/\d/.test(password)) {
-        errors.push('Password must contain at least one number');
+        return {
+            isStrong: false,
+            error: 'Password must contain at least one number'
+        };
     }
 
     if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-        errors.push('Password must contain at least one special character');
+        return {
+            isStrong: false,
+            error: 'Password must contain at least one special character'
+        };
     }
 
+    // All checks passed
     return {
-        isStrong: errors.length === 0,
-        errors
+        isStrong: true,
+        error: null
     };
 };
 
@@ -42,7 +55,7 @@ export const hashPassword = async (password) => {
     }
 
     try{
-        const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+        const hashedPassword = await bcrypt.hash(password, config.saltRound);
         return hashedPassword;
     }
     catch(error){
@@ -64,7 +77,8 @@ export const comparePassword = async (password, hashedPassword) => {
     try{
         const isMatch = await bcrypt.compare(password, hashedPassword);
         return isMatch;
-    } catch(error){
+    }
+    catch(error){
         throw new Error(`Error comparing password: ${error.message}`);
     }
 };

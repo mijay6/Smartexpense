@@ -1,0 +1,90 @@
+{
+  "clientName": "Thunder Client",
+  "collectionName": "Smartexpense API",
+  "collectionId": "smartexpense-api",
+  "dateExported": "2025-10-15",
+  "version": "1.2",
+  "folders": [
+    {
+      "id": "auth-folder",
+      "name": "Authentication",
+      "containerId": "",
+      "created": "2025-10-15",
+      "sortNum": 10000
+    }
+  ],
+  "requests": [
+    {
+      "id": "register-request",
+      "name": "Register User",
+      "url": "http://localhost:3000/api/auth/register",
+      "method": "POST",
+      "sortNum": 10000,
+      "created": "2025-10-15",
+      "modified": "2025-10-15",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"nuevo@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"Juan\",\n  \"lastName\": \"Pérez\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "login-request",
+      "name": "Login User",
+      "url": "http://localhost:3000/api/auth/login",
+      "method": "POST",
+      "sortNum": 20000,
+      "created": "2025-10-15",
+      "modified": "2025-10-15",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"nuevo@example.com\",\n  \"password\": \"password123\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "register-error-request",
+      "name": "Register - Missing Field (Error)",
+      "url": "http://localhost:3000/api/auth/register",
+      "method": "POST",
+      "sortNum": 30000,
+      "created": "2025-10-15",
+      "modified": "2025-10-15",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\",\n  \"firstName\": \"John\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    },
+    {
+      "id": "login-error-request",
+      "name": "Login - Wrong Password (Error)",
+      "url": "http://localhost:3000/api/auth/login",
+      "method": "POST",
+      "sortNum": 40000,
+      "created": "2025-10-15",
+      "modified": "2025-10-15",
+      "headers": [],
+      "params": [],
+      "body": {
+        "type": "json",
+        "raw": "{\n  \"email\": \"nuevo@example.com\",\n  \"password\": \"wrongpassword\"\n}",
+        "form": []
+      },
+      "tests": [],
+      "containerId": "auth-folder"
+    }
+  ]
+}

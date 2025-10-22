@@ -1,4 +1,5 @@
 import {PrismaClient} from '@prisma/client';
+import config from '../config/config.js';
 
 const prisma = new PrismaClient({
     log: [
@@ -10,7 +11,6 @@ const prisma = new PrismaClient({
     errorFormat: 'pretty'
 });
 
-
 // helth check
 export const helthDatabase = async () => {
     try{
@@ -21,7 +21,6 @@ export const helthDatabase = async () => {
         return false;
     }
 };
-
 
 // conect to the database
 export const connectDatabase = async () => {
