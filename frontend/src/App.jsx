@@ -5,6 +5,8 @@ import { authStore } from './stores/authStore';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
+import Expenses from './pages/Expenses.jsx';
+import ToastContainer from './components/shared/ToastContainer.jsx';
 
 function ProtectedRoute({ children }) {
   const { isAuthenticated } = authStore();
@@ -21,7 +23,7 @@ function App() {
 
   if (!isInitialized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
+      <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100">
         <div className="text-center">
           <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
@@ -32,6 +34,7 @@ function App() {
 
   return (
     <BrowserRouter>
+      <ToastContainer />
       <Routes>
         {/* Public routes */}
         <Route path="/login" element={<Login/>}/>
@@ -49,6 +52,14 @@ function App() {
         <Route
           path="/"
           element={<Navigate to="/dashboard" replace />}
+        />
+        <Route 
+          path="/expenses"
+          element={
+            <ProtectedRoute>
+              <Expenses />
+            </ProtectedRoute>
+          }
         />
         {/* Page not found */}
         <Route

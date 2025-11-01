@@ -25,6 +25,7 @@ class ErrorBoundary extends Component {
             error: null,
             errorInfo: null
         });
+        setTimeout(() => window.location.reload(),100);
     };
 
     render(){
@@ -58,7 +59,7 @@ class ErrorBoundary extends Component {
                 {this.state.error && (
                     <details className="mb-6 bg-gray-50 p-4 rounded-lg">
                         <summary className="cursor-pointer font-medium text-gray-700 mb-2">
-                        Ver detalles del error (modo desarrollo)
+                        View error details (development mode)
                         </summary>
                         <div className="mt-4 space-y-2">
                         <div className="text-sm">

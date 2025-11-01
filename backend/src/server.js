@@ -1,26 +1,52 @@
 import express from 'express';
 import cors from 'cors';
+import morgan from 'morgan';
 import config from './config/config.js';
 import authRoutes from './routes/auth.routes.js';  
+import expenseRouter from './routes/expense.routes.js';
+import errorHandler from './middleware/errorHandler.middleware.js';
+import categoryRoutes from './routes/category.routes.js';
 
 const app = express();
 
-// Middleware
- 
+// Globals Middlewares
 app.use(cors({
     origin: config.frontendUrl,
     credentials: true,              // Allow cookies 
 }));
-
 app.use(express.json());          
 app.use(express.urlencoded({ extended: true })); 
 
-app.use('/api/auth', authRoutes);
+// logger
 
+if(process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+} else if(process.env.NODE_ENV === 'production') {
+    app.use(morgan('combined'));
+}  
+
+// old logger
+/*
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.path}`);
+    const timestamp = new Date().toISOString();
+    const ip = req.ip || req.socket.remoteAddress || 'unknown';
+
+    console.log(`[${timestamp}] ${req.method} ${req.path} - IP: ${ip}`);
+
+    // log response status
+    res.on('finish', () => {
+        console.log(`[${timestamp}] ${req.method} ${req.path} - Status: ${res.statusCode}`);
+    });
+
     next();
 });
+*/
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/expenses', expenseRouter);
+app.use('/api/categories', categoryRoutes);
+
 
 app.get('/api/auth', (req, res) => {
   res.json({
@@ -68,14 +94,8 @@ app.use((req, res) => {
   });
 });
 
-// General error (500)
-app.use((err, req, res, next) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: err.message || 'An unexpected error occurred'
-  });
-});
+
+app.use(errorHandler);
 
 // Start server
 const server = app.listen(config.port, '0.0.0.0', () => {

@@ -10,9 +10,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Modelo de Usuario
+// user model definition
 model User {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   email     String   @unique
   password  String      
   firstName String   @map("first_name")
@@ -22,5 +22,49 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
+  expenses  Transaction[]
+  categories Category[]
+
   @@map("users") 
+}
+
+// category model definition
+model Category {
+  id        Int      @id @default(autoincrement())
+  userId    String   @map("user_id")
+  name      String
+  color     String   @default("#3B82F6")
+  icon      String   @default("📁")
+  type      String   @default("expense") // expense, income, savings
+  isDefault Boolean  @default(false) @map("is_default")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expenses  Transaction[]
+  
+  @@unique([userId, name]) // to prevent duplicate category names for the same user
+  @@index([userId])        // for faster queries by userId
+  @@map("categories")
+}
+
+// transaction model definition
+model Transaction {
+  id          String   @id @default(uuid())
+  userId      String   @map("user_id")
+  categoryId  Int      @map("category_id")
+  amount      Decimal  @db.Decimal(10,2)
+  description String
+  date        DateTime @default(now())
+  notes       String?
+  receiptUrl  String?  @map("receipt_url")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category    Category  @relation(fields: [categoryId], references: [id])
+  
+  @@index([userId, date]) // for faster queries by userId and date
+  @@index([categoryId])   // for faster queries by categoryId
+  @@map("transactions")
 }

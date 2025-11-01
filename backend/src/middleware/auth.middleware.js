@@ -1,5 +1,5 @@
-import { verifyToken } from '../utils/jwt.js';
-
+import { verifyToken } from '../utils/jwt.utils.js';
+import { AuthenticationError } from '../utils/errors.utils.js';
 
 export const authenticateToken = (req, res, next) => {
     try {
@@ -7,7 +7,7 @@ export const authenticateToken = (req, res, next) => {
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
 
-        if (!token) return res.status(401).json({ error: 'No token provided' });
+        if (!token) throw new AuthenticationError('No token provided');
         
         const decoded = verifyToken(token);
         
@@ -16,7 +16,7 @@ export const authenticateToken = (req, res, next) => {
         
         next();
     } catch (error) {
-        return res.status(401).json({ error: error.message });
+        next(error);
     }
 };
 

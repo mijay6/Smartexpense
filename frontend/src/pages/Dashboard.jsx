@@ -33,12 +33,32 @@ export function Dashboard(){
 
             <main className="max-w-7xl mx-auto px-4 py-8">
                 <h2 className="text-2xl font-bold mb-4">Dashboard</h2>
+                {/*Nav butons*/}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <button
+                        onClick={() => navigate('/expenses')} 
+                        className="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow" 
+                    >
+                        <div className="text-4xl mb-2">💸</div>
+                        <h3 className="text-lg font-semibold">Expenses</h3>
+                        <p className="text-sm text-gray-600">Manage your Expenses</p>
+                    </button>
+                    <div className="bg-white p-6 rounded-lg shadow opacity-50">
+                        <div className="text-4xl mb-2">💰</div>
+                        <h3 className="font-semibold">Income</h3>
+                        <p className="text-sm text-gray-600">Coming soon...</p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-lg shadow opacity-50">
+                        <div className="text-4xl mb-2">🏦</div>
+                        <h3 className="font-semibold">Savings</h3>
+                        <p className="text-sm text-gray-600">Coming soon...</p>
+                    </div>    
+                </div>
                 <div className="bg-white p-6 rounded-lg shadow">
                 <p className="text-gray-600">
-                    Welcome to Expenso! 🎉
+                    Welcome to Expenso! 
                 </p>
-                <p className="text-gray-600 mt-2">
-                    The content of your Dashboard will go here.                </p>
                 </div>
             </main>
         </div>

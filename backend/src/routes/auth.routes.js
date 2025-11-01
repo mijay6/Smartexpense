@@ -1,16 +1,15 @@
 import { Router } from 'express';   
-import { login, register, validateToken } from '../controller/auth.js';
+import { login, register, validateToken } from '../controller/auth.controller.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
 
 const router = Router();
 
-// /api/auth/register
-router.post('/register', register);
+// routes
 
-// /api/auth/login
+router.post('/register', register);
 router.post('/login', login);
 
-// /api/auth/validate - Verify if token is valid
+//  Verify if token is valid
 router.get('/validate', authenticateToken, validateToken);
 
 export default router;
