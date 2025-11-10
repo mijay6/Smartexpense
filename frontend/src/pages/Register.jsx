@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authStore } from '../stores/authStore';
+import { useAuthStore } from '../stores/authStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 export function Register(){
@@ -20,7 +20,7 @@ export function Register(){
         confirmPassword: ''
     });
 
-    const { register, loading, error} = authStore();
+    const { register, loading, error} = useAuthStore();
     const navigate = useNavigate();
 
     const handleChange = (e) => {

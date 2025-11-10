@@ -12,18 +12,19 @@ const clearStorage = () => {
 }
 
 const getErrorMessage = (error) => {
-    if (error.response) {
-        return error.response.data?.error || 
-               error.response.data?.message || 
-               error.response.statusText ||
-               `Server error: ${error.response.status}`;
-    } 
+
+    if (error.response?.data) {
+        return error.response.data.message || 
+               error.response.data.error || 
+               error.response.data.name ||
+               error.response.statusText;
+    }
     return error.message || 'An unexpected error occurred';
 };
 
 
 // this store will manage authentication state
-export const authStore = create((set) => ({
+export const useAuthStore = create((set) => ({
 
     // initial state
     user: null,
@@ -82,6 +83,7 @@ export const authStore = create((set) => ({
                 error: errorMessage || 'Login failed',
                 loading: false
             });
+            console.log(errorMessage);
             throw error;
         }
     },
@@ -114,12 +116,15 @@ export const authStore = create((set) => ({
         }
 
         try { 
-            // Validate token with backend
-            await authService.validateToken();
+            // Validate token with backend and get updated user data
+            const res = await authService.validateToken();
 
-            // Token is valid, restore authentication state
+            // Update localStorage with fresh user data
+            localStorage.setItem('user', JSON.stringify(res.user));
+
+            // Token is valid, restore authentication state with updated user
             set({
-                user: JSON.parse(user),
+                user: res.user,
                 token: token,
                 isAuthenticated: true,
                 isInitialized: true,
@@ -139,4 +144,4 @@ export const authStore = create((set) => ({
     }
 }));
 
-export default authStore;
+export default useAuthStore;

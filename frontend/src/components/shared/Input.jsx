@@ -20,7 +20,7 @@ export function Input({
             )}
             <input
                 type={type}
-                name={name}         // ← NUEVO: Pasar name al input
+                name={name}        
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder}

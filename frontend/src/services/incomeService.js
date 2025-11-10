@@ -1,8 +1,8 @@
 import api from './api';
 
-export const expenseService = {
+export const incomeService = {
 
-    async getExpenses(filters = {}) {
+    async getIncomes(filters = {}) {
 
         const params = new URLSearchParams();
 
@@ -15,29 +15,30 @@ export const expenseService = {
         if (filters.page) params.append('page', filters.page);
         if (filters.limit) params.append('limit', filters.limit);
 
-        const res = await api.get(`/expenses?${params.toString()}`);
+        const res = await api.get(`/incomes?${params.toString()}`);
         return res.data;
     },
 
-    async getExpense(id){
-        const res = await api.get(`/expenses/${id}`);
+    async getIncome(id){
+        const res = await api.get(`/incomes/${id}`);
         return res.data;
     },
 
-    async createExpense(data) {
-        const res = await api.post('/expenses', data);
+    async createIncome(data) {
+        const res = await api.post('/incomes', data);
         return res.data;
     },
 
-    async updateExpense(id, data) {
-        const res = await api.put(`/expenses/${id}`, data);
+    async updateIncome(id, data) {
+        const res = await api.put(`/incomes/${id}`, data);
         return res.data;
     },
 
-    async deleteExpense(id) {
-        const res = await api.delete(`/expenses/${id}`);
+    async deleteIncome(id) { 
+        const res = await api.delete(`/incomes/${id}`);
         return res.data;
     }
 }
 
-export default expenseService;
+export default incomeService;
+ 

@@ -13,6 +13,7 @@ datasource db {
 // user model definition
 model User {
   id        String   @id @default(uuid())
+  role      Role     @default(USER)
   email     String   @unique
   password  String      
   firstName String   @map("first_name")
@@ -28,6 +29,11 @@ model User {
   @@map("users") 
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 // category model definition
 model Category {
   id        Int      @id @default(autoincrement())
@@ -35,7 +41,7 @@ model Category {
   name      String
   color     String   @default("#3B82F6")
   icon      String   @default("📁")
-  type      String   @default("expense") // expense, income, savings
+  type      String   @default("expense") // expense, income, savings // TODO: an enum for type
   isDefault Boolean  @default(false) @map("is_default")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -57,7 +63,7 @@ model Transaction {
   description String
   date        DateTime @default(now())
   notes       String?
-  receiptUrl  String?  @map("receipt_url")
+  receiptUrl  String?  @map("receipt_url")   // TODO: change the name "receipt" to another one for the url
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 

@@ -41,7 +41,10 @@ export async function register(req, res, next) {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
-                lastName: user.lastName
+                lastName: user.lastName,
+                currency: user.currency,
+                country: user.country,
+                role: user.role
             },
             token
         });
@@ -72,7 +75,10 @@ export async function login(req, res, next) {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
-                lastName: user.lastName
+                lastName: user.lastName,
+                currency: user.currency,
+                country: user.country,
+                role: user.role
             },
             token
         });
@@ -91,7 +97,10 @@ export async function validateToken(req, res) {
                 id: true,
                 email: true,
                 firstName: true,
-                lastName: true
+                lastName: true,
+                currency: true,
+                country: true,
+                role: true
             }
         });
 
@@ -103,7 +112,10 @@ export async function validateToken(req, res) {
                 id: user.id,
                 email: user.email,
                 firstName: user.firstName,
-                lastName: user.lastName
+                lastName: user.lastName,
+                currency: user.currency,
+                country: user.country,
+                role: user.role
             }
         });
 

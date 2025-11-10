@@ -2,25 +2,24 @@ import prisma from '../utils/prisma.utils.js';
 import { ValidationError, NotFoundError } from '../utils/errors.utils.js';
 import { validateAmount, validateDescription, validateNotes, validateCategory } from '../utils/validation.utils.js';
 
-export async function getExpenses(req, res, next) {
-    try {
+export async function getIncomes(req, res, next) {
+    try{
         const userId = req.userId;
         const {
-            startDate,
-            endDate,
-            categoryId,
-            minAmount,
+            startDate, 
+            endDate, 
+            categoryId, 
+            minAmount, 
             maxAmount,
             search,
             page = 1,
             limit = 50
         } = req.query;
 
-        // make filters
         const where = {
             userId,
             category: {
-                type: 'expense'
+                type: 'income'
             }
         };
 
@@ -49,7 +48,7 @@ export async function getExpenses(req, res, next) {
             if (minAmount) where.amount.gte = parseFloat(minAmount);
             if (maxAmount) where.amount.lte = parseFloat(maxAmount);
         }
-        
+
         if (search) {
             where.description = {
                 contains: search,
@@ -58,10 +57,10 @@ export async function getExpenses(req, res, next) {
         }
 
         // calculate pagination
-        const skip = (parseInt(page) - 1) * parseInt(limit);
+        const skip = (parseInt(page) - 1) * parseInt(limit); 
 
-        // get expenses
-        const expenses = await prisma.transaction.findMany({
+        // get income
+        const incomes = await prisma.transaction.findMany({
             where,
             include: {
                 category:true
@@ -76,7 +75,7 @@ export async function getExpenses(req, res, next) {
         const total = await prisma.transaction.count({ where });
 
         res.json({
-            expenses,
+            incomes,
             pagination: {
                 page: parseInt(page),
                 limit: parseInt(limit),
@@ -85,23 +84,22 @@ export async function getExpenses(req, res, next) {
             }
         });
     }
-    catch (error){
+    catch(error){
         next(error);
     }
 }
 
-// read a specific expense
-export async function getExpense(req, res, next) {
+export async function getIncome(req, res, next){
     try{
         const userId = req.userId;
         const { id } = req.params;
 
-        const expense = await prisma.transaction.findFirst({
+        const income = await prisma.transaction.findFirst({
             where: {
                 id,
                 userId,
                 category: {
-                    type: 'expense'
+                    type: 'income'
                 }
             },
             include: {
@@ -109,87 +107,81 @@ export async function getExpense(req, res, next) {
             }
         });
 
-        if(!expense) throw new NotFoundError('Expense not found');
+        if(!income) throw new NotFoundError('Income not found');
+        res.json(income);
 
-        res.json(expense);
     }
-    catch (error) {
+    catch(error){
         next(error);
     }
 }
 
-// create a new expense
-export async function createExpense(req, res, next){
+export async function createIncome(req, res, next){
     try{
-        const userId = req.userId
-        const { amount, description, date, categoryId, notes, receiptUrl } = req.body;
+        const userId = req.userId;
+        const { amount, description, date, categoryId, notes } = req.body;
 
-        // Validar todos los campos usando las funciones helper
         const validatedAmount = validateAmount(amount, true);
         const validatedDescription = validateDescription(description, true);
         const validatedNotes = validateNotes(notes);
-        const validatedCategoryId = await validateCategory(categoryId, userId, true, 'expense');
+        const validatedCategoryId = await validateCategory(categoryId, userId, true, 'income');
 
-        const expense = await prisma.transaction.create({
+        const income = await prisma.transaction.create({
             data: {
                 userId,
                 amount: validatedAmount,
                 description: validatedDescription,
-                ...(date && {date: new Date(date)}),
+                ...(date && { date: new Date(date) }),
                 categoryId: validatedCategoryId,
                 notes: validatedNotes,
-                receiptUrl: receiptUrl || null
+                receiptUrl: null
             },
             include: {
                 category: true
-            }  
+            }
         });
 
         res.status(201).json({
-            message: 'Expense created successfully',
-            expense
+            message: 'Income created successfully',
+            income
         });
     }
-    catch (error){
+    catch(error){
         next(error);
     }
 }
 
-// update an existing expense
-export async function updateExpense(req, res, next){
-    try {
+export async function updateIncome(req, res, next){
+    try{
         const userId = req.userId;
         const { id } = req.params;
-        const { amount, description, date, categoryId, notes, receiptUrl } = req.body;
-        
-        const existingExpense = await prisma.transaction.findFirst({
-            where: { 
+        const { amount, description, date, categoryId, notes } = req.body;
+
+        const existingIncome = await prisma.transaction.findFirst({
+            where: {
                 id,
                 userId,
-                category: {
-                    type: 'expense'
+                category:{
+                    type: 'income'
                 }
             }
-        });
+        })
 
-        if (!existingExpense) throw new NotFoundError('Expense not found');
+        if(!existingIncome) throw new NotFoundError('Income not found');
 
-        // Validar campos usando las funciones helper (no son requeridos en update)
         const validatedAmount = amount !== undefined ? validateAmount(amount, false) : undefined;
         const validatedDescription = description !== undefined ? validateDescription(description, false) : undefined;
         const validatedNotes = notes !== undefined ? validateNotes(notes) : undefined;
-        const validatedCategoryId = categoryId !== undefined ? await validateCategory(categoryId, userId, false, 'expense') : undefined;
-
-        // Preparar datos para actualizar
+        const validatedCategoryId = categoryId !== undefined ? await validateCategory(categoryId, userId, false, 'income') : undefined;        
+        
         const updateData = {};
         if (validatedAmount !== undefined) updateData.amount = validatedAmount;
         if (validatedDescription !== undefined) updateData.description = validatedDescription;
         if (date !== undefined) updateData.date = new Date(date);
         if (validatedCategoryId !== undefined) updateData.categoryId = validatedCategoryId;
         if (validatedNotes !== undefined) updateData.notes = validatedNotes;
-        if (receiptUrl !== undefined) updateData.receiptUrl = receiptUrl || null;
-
-        const expense = await prisma.transaction.update({
+        
+        const income = await prisma.transaction.update({
             where: { id },
             data: updateData,
             include: {
@@ -197,40 +189,39 @@ export async function updateExpense(req, res, next){
             }
         });
 
-        res.json({ message: 'Expense updated successfully', expense});
+        res.json({ message: 'Income updated successfully', income});
     }
-    catch (error){
+    catch(error){
         next(error);
     }
 }
 
-// delete an expense
-export async function deleteExpense(req, res, next){
+export async function deleteIncome(req, res, next) {
     try{
         const userId = req.userId;
         const { id } = req.params;
 
-        const existingExpense = await prisma.transaction.findFirst({
+        const income = await prisma.transaction.findFirst({
             where: {
                 id,
                 userId,
                 category: {
-                    type: 'expense'
+                    type: 'income'
                 }
             }
         });
 
-        if (!existingExpense) throw new NotFoundError('Expense not found');
+        if (!income) throw new NotFoundError('Income not found');
 
         await prisma.transaction.delete({
             where: { id }
         });
 
-        res.json({ message: 'Expense deleted successfully' });
+        res.json({ message: 'Income deleted successfully' });
     }
-    catch (error) {
+    catch(error){
         next(error);
     }
 }
 
-export default { getExpenses, getExpense, createExpense, updateExpense, deleteExpense };
+export default { getIncomes, getIncome, createIncome, updateIncome, deleteIncome };

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { authStore } from '../stores/authStore';
+import { useAuthStore } from '../stores/authStore';
 import { useNavigate, Link } from 'react-router-dom';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner'; 
 
@@ -10,7 +10,7 @@ export function Login(){
 
     const [fieldErrors, setFieldErrors] = useState('');
 
-    const { login, loading, error } = authStore(); 
+    const { login, loading, error } = useAuthStore(); 
     
     const navigate = useNavigate();
 
@@ -34,7 +34,6 @@ export function Login(){
         if (!validateForm()) return;
 
         try {
-            console.log('Email:', email);
             await login(email, password);      // send to the backend
             navigate('/dashboard');            // redirect to dashboard after login
         }

@@ -3,7 +3,7 @@ export function LoadingSpinner({
     color = 'blue',
     fullScreen = false,
     inline = false,
-    children  // ← Nuevo: para texto como children
+    children 
 }) {
     const sizeClasses = {
         xs: 'h-4 w-4 border-2',

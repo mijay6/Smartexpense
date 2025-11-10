@@ -1,21 +1,31 @@
 //import { useState } from 'react'
 import { BrowserRouter , Routes, Route, Navigate} from 'react-router-dom';
 import { useEffect } from 'react';
-import { authStore } from './stores/authStore';
+import { useAuthStore } from './stores/authStore';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import Expenses from './pages/Expenses.jsx';
+import Incomes from './pages/Incomes.jsx';
+import AdminPanel from './pages/AdminPanel.jsx';
 import ToastContainer from './components/shared/ToastContainer.jsx';
 
-function ProtectedRoute({ children }) {
-  const { isAuthenticated } = authStore();
-  return isAuthenticated ? <>{children}</>: <Navigate to="/login" />;
+function ProtectedRoute({ children, adminOnly = false  }) {
+  const { isAuthenticated, user } = useAuthStore();
+   if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+    
+    if (adminOnly && user?.role !== 'ADMIN') {
+        return <Navigate to="/dashboard" replace />;
+    }
+    
+    return children;
 }
 
 function App() {
 
-  const { checkAuth, isInitialized } = authStore();
+  const { checkAuth, isInitialized } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
@@ -31,6 +41,7 @@ function App() {
       </div>
     );
   }
+
 
   return (
     <BrowserRouter>
@@ -61,6 +72,21 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route 
+          path="/incomes"
+          element={
+            <ProtectedRoute>
+              <Incomes />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin"
+          element={
+          <ProtectedRoute adminOnly>
+              <AdminPanel />
+          </ProtectedRoute>
+        } />
         {/* Page not found */}
         <Route
           path="*" 

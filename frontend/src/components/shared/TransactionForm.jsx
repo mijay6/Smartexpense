@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import Input from '../shared/Input';
-import Select from '../shared/Select';
-import DateInput from '../shared/DateInput';
-import Button from '../shared/Button';
+import { useCurrency } from '../../hooks/useCurrency';
+import Input from './Input';
+import Select from './Select';
+import DateInput from './DateInput';
+import Button from './Button';
 
-export function ExpenseForm({ expense = null, categories, onSubmit, onCancel, loading }) {
+export function TransactionForm({ transaction = null, categories, onSubmit, onCancel, loading, type = 'expense' }) {
+
+    const { symbol, currency } = useCurrency();
 
     const [formData, setFormData] = useState({
-        amount: expense?.amount || '',
-        description : expense?.description || '',
-        date: expense?.date ? new Date(expense.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        categoryId: expense?.categoryId || '',
-        notes: expense?.notes || '',
+        amount: transaction?.amount || '',
+        description : transaction?.description || '',
+        date: transaction?.date ? new Date(transaction.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        categoryId: transaction?.categoryId || '',
+        notes: transaction?.notes || '',
     });
 
     const [fieldErrors, setFieldErrors] = useState({});
@@ -65,7 +68,6 @@ export function ExpenseForm({ expense = null, categories, onSubmit, onCancel, lo
             errors.notes = `Notes cannot exceed 1000 characters (${formData.notes.length}/1000)`;
         }
 
-        // TODO: see because in schema is required but is set as default if it is not provided
         if (!formData.date) {
             errors.date = 'Date is required';
         }
@@ -94,20 +96,39 @@ export function ExpenseForm({ expense = null, categories, onSubmit, onCancel, lo
         }
     };
 
+    const transactionLabel = type.charAt(0).toUpperCase() + type.slice(1);
+
     return (
         <form onSubmit={handleSubmit} className='space-y-6' noValidate>
-            <Input
-                label="Amount"
-                type="number"
-                name="amount"
-                value={formData.amount}
-                onChange={handleChange}
-                placeholder="0.00"
-                required
-                min="0.01"
-                step="0.01"
-                error={fieldErrors.amount}
-            />  
+            <div className="space-y-1">
+                <label className="block text-sm font-medium text-gray-700">
+                    Amount <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-medium">
+                        {symbol}
+                    </span>
+                    <input
+                        type="number"
+                        name="amount"
+                        value={formData.amount}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        required
+                        min="0.01"
+                        step="0.01"
+                        className={`w-full pl-8 pr-12 py-2 border ${
+                            fieldErrors.amount ? 'border-red-500' : 'border-gray-300'
+                        } rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500`}
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">
+                        {currency}
+                    </span>
+                </div>
+                {fieldErrors.amount && (
+                    <p className="text-red-500 text-sm mt-1">{fieldErrors.amount}</p>
+                )}
+            </div>  
             <Input
                 label="Description"
                 type="text"
@@ -161,13 +182,13 @@ export function ExpenseForm({ expense = null, categories, onSubmit, onCancel, lo
                 )}
             </div>
             <div className="flex gap-3 justify-end">
-                <Button type="button" variant="secondary" onClick={onCancel} disabled={loading}>Cancel</Button>
-                <Button type="submit" variant="primary" disabled={loading}>
-                    {loading ? 'Saving...' : (expense ? 'Update' : 'Create')} Expense
+                <Button type="button" variant="secondary" onClick={onCancel} disabled={loading} className="cursor-pointer">Cancel</Button>
+                <Button type="submit" variant="primary" disabled={loading} className="cursor-pointer">
+                    {loading ? 'Saving...' : (transaction ? 'Update' : 'Create')} {transactionLabel}
                 </Button>
             </div>
         </form>
     );
 }
 
-export default ExpenseForm;
+export default TransactionForm;

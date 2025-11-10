@@ -4,15 +4,25 @@ import morgan from 'morgan';
 import config from './config/config.js';
 import authRoutes from './routes/auth.routes.js';  
 import expenseRouter from './routes/expense.routes.js';
-import errorHandler from './middleware/errorHandler.middleware.js';
+import incomeRouter from './routes/income.routes.js';
 import categoryRoutes from './routes/category.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import errorHandler from './middleware/errorHandler.middleware.js';
 
 const app = express();
 
 // Globals Middlewares
 app.use(cors({
-    origin: config.frontendUrl,
-    credentials: true,              // Allow cookies 
+    origin: function (origin, callback) {
+        if (!origin) return callback(null, true); // allow non-browser requests like Postman
+        if (config.frontendUrls.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+    },
+    
+    credentials: true,  // Allow cookies 
 }));
 app.use(express.json());          
 app.use(express.urlencoded({ extended: true })); 
@@ -45,7 +55,9 @@ app.use((req, res, next) => {
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/expenses', expenseRouter);
+app.use('/api/incomes', incomeRouter);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/admin', adminRoutes); 
 
 
 app.get('/api/auth', (req, res) => {
@@ -94,14 +106,14 @@ app.use((req, res) => {
   });
 });
 
-
 app.use(errorHandler);
 
 // Start server
 const server = app.listen(config.port, '0.0.0.0', () => {
   console.log('=================================');
   console.log(` Server running on http://localhost:${config.port}`);
-  console.log(` Frontend URL: ${config.frontendUrl}`);
+  console.log(` Frontend URLs:`);
+  config.frontendUrls.forEach(url => console.log(`   - ${url}`));
   console.log(` Environment: ${config.nodeEnv}`);
   console.log('=================================');
 });

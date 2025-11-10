@@ -1,33 +1,32 @@
-import { useState, useEffect } from 'react'
-import { useExpenseStore } from '../stores/expenseStore';
+import { useState, useEffect } from 'react';
+import { useIncomeStore } from '../stores/incomeStore';
 import { useToast } from '../hooks/useToast';
 import { getErrorMessage } from '../utils/errorHandler';
 import { LoadingSpinner } from '../components/shared/LoadingSpinner';
 import Sidebar from '../components/dashboard/Sidebar';
-import ExpenseList from '../components/expenses/ExpenseList';
-import TransactionForm from '../components/shared/TransactionForm';
+import IncomeList from '../components/incomes/IncomeList';
 import TransactionFilters from '../components/shared/TransactionFilters';
-import Modal from '../components/shared/Modal';
+import TransactionForm from '../components/shared/TransactionForm';
 import Button from '../components/shared/Button';
+import Modal from '../components/shared/Modal';
 
-export function Expenses(){
+export function Incomes(){
 
-    const { expenses, categories, loading, fetchExpenses, fetchCategories, createExpense, updateExpense, deleteExpense } = useExpenseStore();
+    const { incomes, categories, loading, fetchIncomes, fetchCategories, createIncome, updateIncome, deleteIncome } = useIncomeStore();
     const { addToast } = useToast();
-    
-    const [activeTab, setActiveTab] = useState('expenses');
+
+    const [activeTab, setActiveTab] = useState('incomes');
     const [modalOpen, setModalOpen] = useState(false);
-    const [editingExpense, setEditingExpense] = useState(null);
+    const [editingIncome, setEditingIncome] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // load data on component mount
-    useEffect(() => {
-        document.title = 'Expenses - Expenso';
+    useEffect(()=>{
+        document.title = 'Incomes - Expenso';
         const loadData = async () => {
             setIsLoading(true);
             try {
                 await fetchCategories();
-                await fetchExpenses();
+                await fetchIncomes();
             } catch (error) {
                 addToast(getErrorMessage(error), 'error');
             } finally {
@@ -35,51 +34,50 @@ export function Expenses(){
             }
         };
         loadData();
-    }, [fetchCategories, fetchExpenses, addToast]);
-    
-    // open modal for creating a new expense
+    }, [fetchCategories, fetchIncomes, addToast]);
+
     const handleCreate = () => {
-        setEditingExpense(null);
+        setEditingIncome(null);
         setModalOpen(true);
     };
 
-    const handleEdit = (expense) => {
-        setEditingExpense(expense);
+    const handleEdit = (incomes) => {
+        setEditingIncome(incomes);
         setModalOpen(true);
     };
 
-    const handleSubmit = async (data) => {
+    const handlesubmit = async (data) => {
         try {
-            if(editingExpense){
-                await updateExpense(editingExpense.id, data);
-                addToast('Expense updated successfully!', 'success');
+            if(editingIncome){
+                await updateIncome(editingIncome.id, data);
+                addToast('Income updated successfully!', 'success');
             }else{
-                await createExpense(data);
-                addToast('Expense created successfully!', 'success');
+                await createIncome(data);
+                addToast('Income created successfully!', 'success');
             }
             setModalOpen(false);
-            setEditingExpense(null);    
+            setEditingIncome(null);
         }
         catch(error){
-            console.error('Failed to save expense:', error);
+            console.error('Failed to submit income:', error);
             addToast(getErrorMessage(error), 'error');
         }
     };
 
     const handleDelete = async (id) => {
-        try{
-            await deleteExpense(id);
-            addToast('Expense deleted successfully!', 'success');
-        } 
+        try {
+            await deleteIncome(id);
+            addToast('Income deleted successfully!', 'success');
+        }
         catch(error){
-            console.error('Failed to delete expense:', error);
+            console.error('Failed to delete income:', error);
             addToast(getErrorMessage(error), 'error');
         }
     };
 
     const handleFilter = async (filters) => {
         try {
-            await fetchExpenses(filters);
+            await fetchIncomes(filters);
         } catch (error) {
             addToast(getErrorMessage(error), 'error');
         }
@@ -87,34 +85,33 @@ export function Expenses(){
 
     const handleResetFilters = async () => {
         try {
-            await fetchExpenses();
-        } catch (error) {
+            await fetchIncomes();
+        } catch(error){
             addToast(getErrorMessage(error), 'error');
         }
-    };
+    }
 
     return(
         <div className="flex h-screen overflow-hidden bg-gray-50">
-            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab}/>
+            <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
             <main className="flex-1 overflow-y-auto relative bg-gray-100">
                 {isLoading && (
                     <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm flex items-center justify-center z-50">
                         <LoadingSpinner size="lg">
-                            Loading expenses...
+                            Loading incomes...
                         </LoadingSpinner>
                     </div>
                 )}
-                
                 {/* Header */}
                 <div className="bg-white shadow-sm">
-                    <div className="max-w-7xl mx-auto px-4 py-6">
-                        <div className="flex items-center justify-between">
+                    <div className="max-w-7xl mx-auto py-4 px-6">
+                        <div className="flex items-center justify-between"> 
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900">💸Expenses</h1>
-                                <p className="text-gray-600 mt-1">Manage and track your expenses</p>
+                                <h1 className="text-2xl font-bold text-gray-900">💰Incomes</h1>
+                                <p className="text-gray-600 mt-1">Manage and track your incomes</p>
                             </div>
                             <Button onClick={handleCreate} variant="primary" className="cursor-pointer">
-                                + New Expense
+                                + New Income
                             </Button>
                         </div>
                     </div>
@@ -126,32 +123,34 @@ export function Expenses(){
                         onFilter={handleFilter}
                         onReset={handleResetFilters}
                     />
-                    <ExpenseList
-                        expenses={expenses}
+                    <IncomeList
+                        incomes={incomes}
                         loading={loading}
                         onEdit={handleEdit}
                         onDelete={handleDelete}
                     />
                 </div>
-                {/* Modal to create/edit expense */}
+                <div>
+                {/* Modal to create/edit incomes */}
                 <Modal 
                     isOpen={modalOpen}
-                    onClose={() => {setModalOpen(false); setEditingExpense(null);}}
-                    title={editingExpense ? 'Edit Expense' : 'New Expense'}
+                    onClose={() => {setModalOpen(false); setEditingIncome(null);}}
+                    title={editingIncome ? 'Edit Income' : 'New Income'}
                 >
                     <TransactionForm
-                        transaction={editingExpense}
+                        transaction={editingIncome}
                         categories={categories}
-                        onSubmit={handleSubmit}
-                        onCancel={() => {setModalOpen(false); setEditingExpense(null)}}
+                        onSubmit={handlesubmit}
+                        onCancel={() => {setModalOpen(false); setEditingIncome(null)}}
                         loading={loading}
-                        type="expense"
+                        type="income"
                     />
-                </Modal>
+                </Modal>    
+                </div>
             </main>
-        </div> 
+        </div>
     );
+
 }
 
-export default Expenses;
-
+export default Incomes;
